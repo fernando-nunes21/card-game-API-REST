@@ -1,4 +1,4 @@
-package com.project.cardgame.cards.exceptions
+package com.project.cardgame.exceptions
 
 class LimitInvalidException extends RuntimeException{
     LimitInvalidException(String error){

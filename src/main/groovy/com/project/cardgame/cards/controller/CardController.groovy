@@ -1,7 +1,10 @@
-package com.project.cardgame.cards
+package com.project.cardgame.cards.controller
 
-import com.project.cardgame.cards.exceptions.LimitInvalidException
-import com.project.cardgame.cards.exceptions.OffsetInvalidException
+import com.project.cardgame.cards.Card
+import com.project.cardgame.cards.CardHeader
+import com.project.cardgame.exceptions.LimitInvalidException
+
+import com.project.cardgame.cards.service.CardService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -33,7 +36,7 @@ class CardController {
         try{
             this.cardService.getCards(offset, limit, name)
             return new ResponseEntity<>(HttpStatus.OK)
-        } catch (OffsetInvalidException | LimitInvalidException error) {
+        } catch (LimitInvalidException error) {
             return new ResponseEntity<>(error.getMessage(),HttpStatus.BAD_REQUEST)
         }
 
