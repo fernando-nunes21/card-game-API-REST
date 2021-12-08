@@ -3,6 +3,8 @@ package com.project.cardgame.cards.service
 import com.project.cardgame.cards.Card
 import com.project.cardgame.cards.CardHeader
 import com.project.cardgame.cards.exceptions.InvalidAuthentication
+import com.project.cardgame.cards.exceptions.NotFoundCard
+import com.project.cardgame.cards.exceptions.NotFoundCards
 import com.project.cardgame.exceptions.LimitInvalidException
 import com.project.cardgame.cards.repository.CardRepository
 import org.springframework.beans.factory.annotation.Value
@@ -24,17 +26,24 @@ class CardServiceImpl implements CardService {
 
     @Override
     List<Card> getCards(Integer offset, Integer limit, String name) {
+        List<Card> cards
         validateLimitField(limit)
         if (isNameFieldEmpty(name)) {
-            return cardRepository.getAll(offset, limit)
+            cards = cardRepository.getAll(offset, limit)
         } else {
-            return cardRepository.getAllByName(offset, limit, name)
+            cards = cardRepository.getAllByName(offset, limit, name)
         }
+        validateCardsNotNull(cards)
+        return cards
     }
 
     @Override
     Card getCardById(Integer id) {
-        return cardRepository.getById(id)
+        try{
+            return cardRepository.getById(id)
+        } catch (Exception ignored){
+            throw new NotFoundCard("Nao foi encontrada a carta com id: ${id}")
+        }
     }
 
     @Override
@@ -55,6 +64,12 @@ class CardServiceImpl implements CardService {
         cardRepository.delete(id)
     }
 
+    private void validateCardsNotNull(List<Card> cards){
+        if(cards.size() == 0){
+            throw new NotFoundCards("Não foi encontrada nenhuma carta")
+        }
+    }
+
     private void validateRequestAuth(String auth){
         if(!adminAuthentication.equalsIgnoreCase(auth.md5())){
             throw new InvalidAuthentication("Autenticação: ${auth} é invalida")
@@ -62,7 +77,7 @@ class CardServiceImpl implements CardService {
     }
 
     private boolean isNameFieldEmpty(String name) {
-        return name.equalsIgnoreCase("")
+        return name.equalsIgnoreCase("") || name == null
     }
 
     private void validateLimitField(Integer limit) {

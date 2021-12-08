@@ -1,14 +1,19 @@
 package com.project.cardgame.cards
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import groovy.transform.Canonical
 
 @Canonical
 class Card {
-    private Integer id
-    private String name
-    private String typeCard
-    private String description
+
+    Integer id
+    String name
+
+    @JsonProperty("typecard")
+    String typeCard
+    String description
 
     Card(){}
+
 
 }
