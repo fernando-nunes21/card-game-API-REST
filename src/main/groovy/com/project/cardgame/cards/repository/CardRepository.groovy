@@ -1,7 +1,7 @@
 package com.project.cardgame.cards.repository
 
 import com.project.cardgame.cards.Card
-import com.project.cardgame.cards.service.CardRowMapper
+import com.project.cardgame.cards.CardRowMapper
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Service
 
@@ -38,7 +38,7 @@ class CardRepository {
         Object[] params = new Object[]{
             id
         }
-        return jdbcTemplate.queryForObject(sql, Card.class, params)
+        return jdbcTemplate.queryForObject(sql, new CardRowMapper(), params)
     }
 
     void insert(Card card) {
@@ -52,10 +52,21 @@ class CardRepository {
     }
 
     void edit(Integer id, Card card) {
-
+        String sql = "UPDATE cards SET name = ?, typecard = ?, description = ? WHERE id = ?"
+        Object[] params = new Object[]{
+                card.name,
+                card.typeCard,
+                card.description,
+                id
+        }
+        jdbcTemplate.update(sql, params)
     }
 
     void delete(Integer id) {
-
+        String sql = "DELETE FROM cards WHERE id = ?"
+        Object[] params = new Object[]{
+            id
+        }
+        jdbcTemplate.update(sql, params)
     }
 }

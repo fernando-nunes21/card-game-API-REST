@@ -1,4 +1,4 @@
-package com.project.cardgame.cards.service
+package com.project.cardgame.cards
 
 import com.project.cardgame.cards.Card
 import org.springframework.jdbc.core.RowMapper

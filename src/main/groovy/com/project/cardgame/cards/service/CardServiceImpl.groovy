@@ -1,13 +1,12 @@
 package com.project.cardgame.cards.service
 
 import com.project.cardgame.cards.Card
-import com.project.cardgame.cards.CardHeader
+import com.project.cardgame.cards.exceptions.InputEmptyField
 import com.project.cardgame.cards.exceptions.InvalidAuthentication
 import com.project.cardgame.cards.exceptions.NotFoundCard
 import com.project.cardgame.cards.exceptions.NotFoundCards
 import com.project.cardgame.exceptions.LimitInvalidException
 import com.project.cardgame.cards.repository.CardRepository
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
 @Service
@@ -15,8 +14,7 @@ class CardServiceImpl implements CardService {
 
     private final DEFAULT_LIMIT = 30
 
-    @Value('$[card.auth}')
-    private String adminAuthentication
+    private String adminAuthentication = "bb987b6db56204c9d3348293a9c511a0"
 
     private CardRepository cardRepository
 
@@ -28,7 +26,7 @@ class CardServiceImpl implements CardService {
     List<Card> getCards(Integer offset, Integer limit, String name) {
         List<Card> cards
         validateLimitField(limit)
-        if (isNameFieldEmpty(name)) {
+        if (isFieldEmpty(name)) {
             cards = cardRepository.getAll(offset, limit)
         } else {
             cards = cardRepository.getAllByName(offset, limit, name)
@@ -47,21 +45,45 @@ class CardServiceImpl implements CardService {
     }
 
     @Override
-    void createCard(CardHeader cardHeader, Card card) {
-        validateRequestAuth(cardHeader.auth)
+    void createCard(String auth, Card card) {
+        validateRequestAuth(auth)
+        validateInputCardFields(card)
         cardRepository.insert(card)
     }
 
     @Override
-    void editCard(CardHeader cardHeader, Integer id, Card card) {
-        validateRequestAuth(cardHeader.auth)
-        cardRepository.edit(id, card)
+    void editCard(String auth, Integer id, Card card) {
+        validateRequestAuth(auth)
+        validateInputCardFields(card)
+        try{
+            cardRepository.getById(id)
+            cardRepository.edit(id, card)
+        } catch (Exception ignored){
+            throw new NotFoundCard("Nao foi encontrada a carta com id: ${id}")
+        }
     }
 
     @Override
-    void deleteCard(CardHeader cardHeader, Integer id) {
-        validateRequestAuth(cardHeader.auth)
-        cardRepository.delete(id)
+    void deleteCard(String auth, Integer id) {
+        validateRequestAuth(auth)
+        try{
+            cardRepository.getById(id)
+            cardRepository.delete(id)
+        } catch (Exception ignored){
+            throw new NotFoundCard("Nao foi encontrada a carta com id: ${id}")
+        }
+    }
+
+    private void validateInputCardFields(Card card){
+        if(isFieldEmpty(card.name)){
+            throw new InputEmptyField("O campo do nome está vazio ou é nulo")
+        }
+        if(isFieldEmpty(card.typeCard)){
+            throw new InputEmptyField("O campo do tipo de card está vazio ou é nulo")
+        }
+        if(isFieldEmpty(card.description)){
+            throw new InputEmptyField("O campo de descrição do card está vazio ou é nulo")
+        }
     }
 
     private void validateCardsNotNull(List<Card> cards){
@@ -76,13 +98,17 @@ class CardServiceImpl implements CardService {
         }
     }
 
-    private boolean isNameFieldEmpty(String name) {
-        return name.equalsIgnoreCase("") || name == null
+    private boolean isFieldEmpty(String name) {
+        if(name == null){
+            return true
+        } else{
+            return name.equalsIgnoreCase("")
+        }
     }
 
     private void validateLimitField(Integer limit) {
         if (isLimitInvalid(limit)) {
-            throw new LimitInvalidException("Tamanho do limit: ${limit} maior que o limit DEFAULT: ${DEFAULT_LIMIT}")
+            throw new LimitInvalidException("Tamanho do limit: ${limit}. Valor maior que o limit DEFAULT: ${DEFAULT_LIMIT}")
         }
     }
 
