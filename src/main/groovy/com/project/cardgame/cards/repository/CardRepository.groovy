@@ -14,7 +14,8 @@ class CardRepository {
         this.jdbcTemplate = jdbcTemplate
     }
 
-    List<Card> getAll(Integer offset, Integer limit) {
+    //TODO - fazer filtro aqui mesmo e remover getAllByName
+    List<Card> getAll(Integer offset, Integer limit, String cardName) {
         String sql = "SELECT * FROM cards WHERE 1 = 1 OFFSET ? LIMIT ?"
         Object[] params = new Object[]{
                 offset,
@@ -42,6 +43,8 @@ class CardRepository {
     }
 
     void insert(Card card) {
+        //TODO - Alterar typecard do banco pra type_card
+        //TODO - Pegar um return do ID
         String sql = "INSERT INTO cards (name, typecard, description) VALUES (?, ?, ?)"
         Object[] params = new Object[]{
             card.name,

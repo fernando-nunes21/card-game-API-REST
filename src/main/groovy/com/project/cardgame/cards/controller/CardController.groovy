@@ -41,8 +41,10 @@ class CardController {
                             @RequestParam Integer limit,
                             @RequestParam(required = false) String name) {
         try {
+            //Todo - Desacoplar o retorno da service
             List<Card> cards = this.cardService.getCards(offset, limit, name)
             return new ResponseEntity(cards, HttpStatus.OK)
+            //TODO - Busca vazio não é tão ruim quanto eu achava.
         } catch (NotFoundCards error) {
             return new ResponseEntity(new ErrorDetails(error.getMessage()), HttpStatus.NOT_FOUND)
         } catch (LimitInvalidException error) {

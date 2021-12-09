@@ -14,6 +14,8 @@ class CardServiceImpl implements CardService {
 
     private final DEFAULT_LIMIT = 30
 
+    //TODO - Mudar autenticação na mao pra InterceptHttp
+    //TODO - 2 tokens (Admin) - Dentro intercepter
     private String adminAuthentication = "bb987b6db56204c9d3348293a9c511a0"
 
     private CardRepository cardRepository
@@ -57,7 +59,9 @@ class CardServiceImpl implements CardService {
         validateInputCardFields(card)
         try{
             cardRepository.getById(id)
+            //Todo - Validar se o próprio edit ja não estoura exceção ao chegar id invalido
             cardRepository.edit(id, card)
+            //TODO - catch da exception correta.
         } catch (Exception ignored){
             throw new NotFoundCard("Nao foi encontrada a carta com id: ${id}")
         }
@@ -67,6 +71,7 @@ class CardServiceImpl implements CardService {
     void deleteCard(String auth, Integer id) {
         validateRequestAuth(auth)
         try{
+            //TODO - samething da de cima.
             cardRepository.getById(id)
             cardRepository.delete(id)
         } catch (Exception ignored){

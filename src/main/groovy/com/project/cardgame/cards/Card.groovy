@@ -9,6 +9,7 @@ class Card {
     Integer id
     String name
 
+    //TODO - alterar isso aqui no modelo do projeto e aqui
     @JsonProperty("typecard")
     String typeCard
     String description
