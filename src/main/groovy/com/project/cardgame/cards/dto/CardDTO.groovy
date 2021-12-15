@@ -1,14 +1,14 @@
-package com.project.cardgame.cards
+package com.project.cardgame.cards.dto
 
 import groovy.transform.Canonical
 
 @Canonical
-class Card {
+class CardDTO {
 
     Integer id
     String name
     String typeCard
     String description
 
-    Card(){}
+    CardDTO(){}
 }

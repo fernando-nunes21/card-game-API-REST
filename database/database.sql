@@ -3,7 +3,7 @@ CREATE DATABASE cardgame;
 CREATE TABLE cards (
 	id SERIAL,
 	name VARCHAR(90),
-	typeCard VARCHAR(30),
+	type_card VARCHAR(30),
 	description VARCHAR(120)
 );
 

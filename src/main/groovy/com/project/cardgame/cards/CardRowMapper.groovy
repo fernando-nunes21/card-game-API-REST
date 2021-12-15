@@ -11,7 +11,7 @@ class CardRowMapper implements RowMapper<Card> {
         Card card = new Card()
         card.id = resultSet.getInt("id")
         card.name = resultSet.getString("name")
-        card.typeCard = resultSet.getString("typecard")
+        card.typeCard = resultSet.getString("type_card")
         card.description = resultSet.getString("description")
         return card
     }

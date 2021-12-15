@@ -1,9 +1,9 @@
 package com.project.cardgame.handler
 
-class ResponseDetails {
+class MessageResponse {
     private String response
 
-    ResponseDetails(String response){
+    MessageResponse(String response){
         this.response = response
     }
 

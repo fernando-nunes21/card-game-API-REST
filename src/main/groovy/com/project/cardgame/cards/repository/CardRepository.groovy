@@ -14,20 +14,9 @@ class CardRepository {
         this.jdbcTemplate = jdbcTemplate
     }
 
-    //TODO - fazer filtro aqui mesmo e remover getAllByName
-    List<Card> getAll(Integer offset, Integer limit, String cardName) {
-        String sql = "SELECT * FROM cards WHERE 1 = 1 OFFSET ? LIMIT ?"
+    List<Card> getAll(Integer offset, Integer limit, String name) {
+        String sql = "SELECT * FROM cards WHERE 1 = 1 ${name ? "AND name LIKE '${name}'" : ""} OFFSET ? LIMIT ?"
         Object[] params = new Object[]{
-                offset,
-                limit
-        }
-        return jdbcTemplate.query(sql, new CardRowMapper(), params)
-    }
-
-    List<Card> getAllByName(Integer offset, Integer limit, String name) {
-        String sql = "SELECT * FROM cards WHERE 1 = 1 AND name LIKE ? OFFSET ? LIMIT ?"
-        Object[] params = new Object[]{
-                name,
                 offset,
                 limit
         }
@@ -42,34 +31,32 @@ class CardRepository {
         return jdbcTemplate.queryForObject(sql, new CardRowMapper(), params)
     }
 
-    void insert(Card card) {
-        //TODO - Alterar typecard do banco pra type_card
-        //TODO - Pegar um return do ID
-        String sql = "INSERT INTO cards (name, typecard, description) VALUES (?, ?, ?)"
+    Integer insert(Card card) {
+        String sql = "INSERT INTO cards (name, type_card, description) VALUES (?, ?, ?) RETURNING id"
         Object[] params = new Object[]{
             card.name,
             card.typeCard,
             card.description
         }
-        jdbcTemplate.update(sql, params)
+        return jdbcTemplate.queryForObject(sql, Integer.class, params)
     }
 
-    void edit(Integer id, Card card) {
-        String sql = "UPDATE cards SET name = ?, typecard = ?, description = ? WHERE id = ?"
+    Integer edit(Integer id, Card card) {
+        String sql = "UPDATE cards SET name = ?, type_card = ?, description = ? WHERE id = ? RETURNING id"
         Object[] params = new Object[]{
                 card.name,
                 card.typeCard,
                 card.description,
                 id
         }
-        jdbcTemplate.update(sql, params)
+        return jdbcTemplate.queryForObject(sql, Integer.class, params)
     }
 
-    void delete(Integer id) {
-        String sql = "DELETE FROM cards WHERE id = ?"
+    Integer delete(Integer id) {
+        String sql = "DELETE FROM cards WHERE id = ? RETURNING id"
         Object[] params = new Object[]{
             id
         }
-        jdbcTemplate.update(sql, params)
+        return jdbcTemplate.queryForObject(sql, Integer.class, params)
     }
 }

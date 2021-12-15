@@ -1,13 +1,19 @@
 package com.project.cardgame.cards.service
 
 import com.project.cardgame.cards.Card
+import com.project.cardgame.cards.dto.CardDTO
+import com.project.cardgame.cards.dto.CardMapperImpl
 import com.project.cardgame.cards.exceptions.InputEmptyField
 import com.project.cardgame.cards.exceptions.InvalidAuthentication
 import com.project.cardgame.cards.exceptions.NotFoundCard
-import com.project.cardgame.cards.exceptions.NotFoundCards
+
 import com.project.cardgame.exceptions.LimitInvalidException
 import com.project.cardgame.cards.repository.CardRepository
+import com.project.cardgame.handler.MessageResponse
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.stereotype.Service
+
+import java.util.stream.Collectors
 
 @Service
 class CardServiceImpl implements CardService {
@@ -18,82 +24,72 @@ class CardServiceImpl implements CardService {
     //TODO - 2 tokens (Admin) - Dentro intercepter
     private String adminAuthentication = "bb987b6db56204c9d3348293a9c511a0"
 
-    private CardRepository cardRepository
+    private final CardRepository cardRepository
+    private final CardMapperImpl cardMapper
 
-    CardServiceImpl(CardRepository cardRepository) {
+    CardServiceImpl(CardRepository cardRepository, CardMapperImpl cardMapper) {
         this.cardRepository = cardRepository
+        this.cardMapper = cardMapper
     }
 
     @Override
-    List<Card> getCards(Integer offset, Integer limit, String name) {
-        List<Card> cards
+    List<CardDTO> getCards(Integer offset, Integer limit, String name) {
         validateLimitField(limit)
-        if (isFieldEmpty(name)) {
-            cards = cardRepository.getAll(offset, limit)
-        } else {
-            cards = cardRepository.getAllByName(offset, limit, name)
-        }
-        validateCardsNotNull(cards)
-        return cards
+        List<Card> cards = cardRepository.getAll(offset, limit, name)
+        return cards.stream()
+                .map(cardMapper::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    Card getCardById(Integer id) {
+    CardDTO getCardById(Integer id) {
         try{
-            return cardRepository.getById(id)
-        } catch (Exception ignored){
+            return cardMapper.convertToDTO(this.cardRepository.getById(id))
+        } catch (EmptyResultDataAccessException ignored){
             throw new NotFoundCard("Nao foi encontrada a carta com id: ${id}")
         }
     }
 
     @Override
-    void createCard(String auth, Card card) {
+    MessageResponse createCard(String auth, CardDTO cardDTO) {
         validateRequestAuth(auth)
-        validateInputCardFields(card)
-        cardRepository.insert(card)
+        validateInputCardFields(cardDTO)
+        Integer cardId = cardRepository.insert(cardMapper.convertToEntity(cardDTO))
+        return new MessageResponse("Card ID: ${cardId} criada com sucesso!")
     }
 
     @Override
-    void editCard(String auth, Integer id, Card card) {
+    MessageResponse editCard(String auth, Integer id, CardDTO cardDTO) {
         validateRequestAuth(auth)
-        validateInputCardFields(card)
+        validateInputCardFields(cardDTO)
         try{
-            cardRepository.getById(id)
-            //Todo - Validar se o próprio edit ja não estoura exceção ao chegar id invalido
-            cardRepository.edit(id, card)
-            //TODO - catch da exception correta.
-        } catch (Exception ignored){
+            Integer cardEditedId = cardRepository.edit(id, cardMapper.convertToEntity(cardDTO))
+            return new MessageResponse("Card ID: ${cardEditedId} editada com sucesso!")
+        } catch (EmptyResultDataAccessException ignored){
             throw new NotFoundCard("Nao foi encontrada a carta com id: ${id}")
         }
     }
 
     @Override
-    void deleteCard(String auth, Integer id) {
+    MessageResponse deleteCard(String auth, Integer id) {
         validateRequestAuth(auth)
         try{
-            //TODO - samething da de cima.
-            cardRepository.getById(id)
-            cardRepository.delete(id)
-        } catch (Exception ignored){
+            Integer cardDeletedId = cardRepository.delete(id)
+            return new MessageResponse("Card ID: ${cardDeletedId} deletada com sucesso!")
+        } catch (EmptyResultDataAccessException ignored){
             throw new NotFoundCard("Nao foi encontrada a carta com id: ${id}")
         }
     }
 
-    private void validateInputCardFields(Card card){
-        if(isFieldEmpty(card.name)){
+    private void validateInputCardFields(CardDTO cardDTO) {
+        if (isFieldEmpty(cardDTO.name)) {
             throw new InputEmptyField("O campo do nome está vazio ou é nulo")
         }
-        if(isFieldEmpty(card.typeCard)){
+        if (isFieldEmpty(cardDTO.typeCard)) {
             throw new InputEmptyField("O campo do tipo de card está vazio ou é nulo")
         }
-        if(isFieldEmpty(card.description)){
+        if (isFieldEmpty(cardDTO.description)) {
             throw new InputEmptyField("O campo de descrição do card está vazio ou é nulo")
-        }
-    }
-
-    private void validateCardsNotNull(List<Card> cards){
-        if(cards.size() == 0){
-            throw new NotFoundCards("Não foi encontrada nenhuma carta")
         }
     }
 
@@ -113,7 +109,8 @@ class CardServiceImpl implements CardService {
 
     private void validateLimitField(Integer limit) {
         if (isLimitInvalid(limit)) {
-            throw new LimitInvalidException("Tamanho do limit: ${limit}. Valor maior que o limit DEFAULT: ${DEFAULT_LIMIT}")
+            throw new LimitInvalidException("Tamanho do limit: ${limit}. Valor maior que o limit DEFAULT: " +
+                    "${DEFAULT_LIMIT}")
         }
     }
 
