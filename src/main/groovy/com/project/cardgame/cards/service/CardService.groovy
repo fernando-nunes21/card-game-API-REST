@@ -9,10 +9,10 @@ interface CardService {
 
     CardDTO getCardById(Integer id)
 
-    MessageResponse createCard(String auth, CardDTO card)
+    MessageResponse createCard(CardDTO card)
 
-    MessageResponse editCard(String auth, Integer id, CardDTO card)
+    MessageResponse editCard(Integer id, CardDTO card)
 
-    MessageResponse deleteCard(String auth, Integer id)
+    MessageResponse deleteCard(Integer id)
 
 }

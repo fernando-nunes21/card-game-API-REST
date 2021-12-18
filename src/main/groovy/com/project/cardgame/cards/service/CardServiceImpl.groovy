@@ -4,7 +4,7 @@ import com.project.cardgame.cards.Card
 import com.project.cardgame.cards.dto.CardDTO
 import com.project.cardgame.cards.dto.CardMapperImpl
 import com.project.cardgame.cards.exceptions.InputEmptyField
-import com.project.cardgame.cards.exceptions.InvalidAuthentication
+
 import com.project.cardgame.cards.exceptions.NotFoundCard
 
 import com.project.cardgame.exceptions.LimitInvalidException
@@ -19,10 +19,6 @@ import java.util.stream.Collectors
 class CardServiceImpl implements CardService {
 
     private final DEFAULT_LIMIT = 30
-
-    //TODO - Mudar autenticação na mao pra InterceptHttp
-    //TODO - 2 tokens (Admin) - Dentro intercepter
-    private String adminAuthentication = "bb987b6db56204c9d3348293a9c511a0"
 
     private final CardRepository cardRepository
     private final CardMapperImpl cardMapper
@@ -51,16 +47,14 @@ class CardServiceImpl implements CardService {
     }
 
     @Override
-    MessageResponse createCard(String auth, CardDTO cardDTO) {
-        validateRequestAuth(auth)
+    MessageResponse createCard(CardDTO cardDTO) {
         validateInputCardFields(cardDTO)
         Integer cardId = cardRepository.insert(cardMapper.convertToEntity(cardDTO))
         return new MessageResponse("Card ID: ${cardId} criada com sucesso!")
     }
 
     @Override
-    MessageResponse editCard(String auth, Integer id, CardDTO cardDTO) {
-        validateRequestAuth(auth)
+    MessageResponse editCard(Integer id, CardDTO cardDTO) {
         validateInputCardFields(cardDTO)
         try{
             Integer cardEditedId = cardRepository.edit(id, cardMapper.convertToEntity(cardDTO))
@@ -71,8 +65,7 @@ class CardServiceImpl implements CardService {
     }
 
     @Override
-    MessageResponse deleteCard(String auth, Integer id) {
-        validateRequestAuth(auth)
+    MessageResponse deleteCard(Integer id) {
         try{
             Integer cardDeletedId = cardRepository.delete(id)
             return new MessageResponse("Card ID: ${cardDeletedId} deletada com sucesso!")
@@ -90,12 +83,6 @@ class CardServiceImpl implements CardService {
         }
         if (isFieldEmpty(cardDTO.description)) {
             throw new InputEmptyField("O campo de descrição do card está vazio ou é nulo")
-        }
-    }
-
-    private void validateRequestAuth(String auth){
-        if(!adminAuthentication.equalsIgnoreCase(auth.md5())){
-            throw new InvalidAuthentication("Autenticação: ${auth} é invalida")
         }
     }
 
