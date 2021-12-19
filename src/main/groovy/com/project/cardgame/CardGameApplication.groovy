@@ -1,12 +1,12 @@
 package com.project.cardgame
 
 import com.project.cardgame.cards.dto.CardMapperImpl
+import com.project.cardgame.decks.dto.DeckMapperImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 
 @SpringBootApplication
 class CardGameApplication {
@@ -16,7 +16,12 @@ class CardGameApplication {
 
 	@Bean
 	CardMapperImpl cardMapper() {
-		return new CardMapperImpl();
+		return new CardMapperImpl()
+	}
+
+	@Bean
+	DeckMapperImpl deckMapper(){
+		return new DeckMapperImpl()
 	}
 
 	static void main(String[] args) {

@@ -5,13 +5,13 @@ import com.project.cardgame.handler.MessageResponse
 
 interface CardService {
 
-    List<CardDTO> getCards(Integer offset, Integer Limit, String name)
+    List<CardDTO> getCards(Integer offset, Integer limit, String name)
 
     CardDTO getCardById(Integer id)
 
-    MessageResponse createCard(CardDTO card)
+    MessageResponse createCard(CardDTO cardDTO)
 
-    MessageResponse editCard(Integer id, CardDTO card)
+    MessageResponse editCard(Integer id, CardDTO cardDTO)
 
     MessageResponse deleteCard(Integer id)
 

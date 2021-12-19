@@ -10,6 +10,6 @@ CREATE TABLE cards (
 CREATE TABLE decks (
 	id SERIAL,
 	name VARCHAR(90),
-	cards JSON,
+	id_cards INTEGER[],
 	description VARCHAR(120)
 );
