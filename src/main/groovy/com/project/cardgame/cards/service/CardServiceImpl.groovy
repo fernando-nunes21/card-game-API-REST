@@ -3,9 +3,9 @@ package com.project.cardgame.cards.service
 import com.project.cardgame.cards.Card
 import com.project.cardgame.cards.dto.CardDTO
 import com.project.cardgame.cards.dto.CardMapperImpl
-import com.project.cardgame.cards.exceptions.InputEmptyField
+import com.project.cardgame.exceptions.InvalidInputFieldException
 
-import com.project.cardgame.cards.exceptions.NotFoundCard
+import com.project.cardgame.exceptions.NotFoundException
 
 import com.project.cardgame.exceptions.LimitInvalidException
 import com.project.cardgame.cards.repository.CardRepository
@@ -42,7 +42,7 @@ class CardServiceImpl implements CardService {
         try{
             return cardMapper.convertToDTO(this.cardRepository.getById(id))
         } catch (EmptyResultDataAccessException ignored){
-            throw new NotFoundCard("Nao foi encontrada a carta com id: ${id}")
+            throw new NotFoundException("Nao foi encontrada a carta com id: ${id}")
         }
     }
 
@@ -60,7 +60,7 @@ class CardServiceImpl implements CardService {
             Integer cardEditedId = cardRepository.edit(id, cardMapper.convertToEntity(cardDTO))
             return new MessageResponse("Card ID: ${cardEditedId} editada com sucesso!")
         } catch (EmptyResultDataAccessException ignored){
-            throw new NotFoundCard("Nao foi encontrada a carta com id: ${id}")
+            throw new NotFoundException("Nao foi encontrada a carta com id: ${id}")
         }
     }
 
@@ -70,19 +70,19 @@ class CardServiceImpl implements CardService {
             Integer cardDeletedId = cardRepository.delete(id)
             return new MessageResponse("Card ID: ${cardDeletedId} deletada com sucesso!")
         } catch (EmptyResultDataAccessException ignored){
-            throw new NotFoundCard("Nao foi encontrada a carta com id: ${id}")
+            throw new NotFoundException("Nao foi encontrada a carta com id: ${id}")
         }
     }
 
     private void validateInputCardFields(CardDTO cardDTO) {
         if (isFieldEmpty(cardDTO.name)) {
-            throw new InputEmptyField("O campo do nome está vazio ou é nulo")
+            throw new InvalidInputFieldException("O campo do nome está vazio ou é nulo")
         }
         if (isFieldEmpty(cardDTO.typeCard)) {
-            throw new InputEmptyField("O campo do tipo de card está vazio ou é nulo")
+            throw new InvalidInputFieldException("O campo do tipo de card está vazio ou é nulo")
         }
         if (isFieldEmpty(cardDTO.description)) {
-            throw new InputEmptyField("O campo de descrição do card está vazio ou é nulo")
+            throw new InvalidInputFieldException("O campo de descrição do card está vazio ou é nulo")
         }
     }
 

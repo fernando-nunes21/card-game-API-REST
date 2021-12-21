@@ -1,8 +1,8 @@
 package com.project.cardgame.decks.service
 
-import com.project.cardgame.cards.Card
-import com.project.cardgame.cards.exceptions.InputEmptyField
-import com.project.cardgame.cards.exceptions.NotFoundCard
+
+import com.project.cardgame.exceptions.InvalidInputFieldException
+import com.project.cardgame.exceptions.NotFoundException
 import com.project.cardgame.decks.Deck
 import com.project.cardgame.decks.dto.DeckDTO
 import com.project.cardgame.decks.dto.DeckMapperImpl
@@ -41,7 +41,7 @@ class DeckServiceImpl implements DeckService {
         try {
             return deckMapper.convertToDTO(this.deckRepository.getById(id))
         } catch (EmptyResultDataAccessException ignored) {
-            throw new NotFoundCard("Nao foi encontrado o baralho com id: ${id}")
+            throw new NotFoundException("Nao foi encontrado o baralho com id: ${id}")
         }
     }
 
@@ -59,7 +59,7 @@ class DeckServiceImpl implements DeckService {
             Integer deckEditedId = deckRepository.edit(id, deckMapper.convertToEntity(deckDTO))
             return new MessageResponse("Deck ID: ${deckEditedId} editado com sucesso!")
         } catch (EmptyResultDataAccessException ignored){
-            throw new NotFoundCard("Nao foi encontrada o baralho com id: ${id}")
+            throw new NotFoundException("Nao foi encontrada o baralho com id: ${id}")
         }
     }
 
@@ -69,19 +69,19 @@ class DeckServiceImpl implements DeckService {
             Integer deckDeletedId = deckRepository.delete(id)
             return new MessageResponse("Deck ID: ${deckDeletedId} deletado com sucesso!")
         } catch (EmptyResultDataAccessException ignored){
-            throw new NotFoundCard("Nao foi encontrada o baralho com id: ${id}")
+            throw new NotFoundException("Nao foi encontrada o baralho com id: ${id}")
         }
     }
 
     private void validateInputDeckFields(DeckDTO deckDTO) {
         if (isFieldEmpty(deckDTO.name)) {
-            throw new InputEmptyField("O campo do nome está vazio ou é nulo")
+            throw new InvalidInputFieldException("O campo do nome está vazio ou é nulo")
         }
         if (isFieldEmpty(deckDTO.idCards)) {
-            throw new InputEmptyField("O campo de cards está vazio ou é nulo")
+            throw new InvalidInputFieldException("O campo de cards está vazio ou é nulo")
         }
         if (isFieldEmpty(deckDTO.description)) {
-            throw new InputEmptyField("O campo de descrição do card está vazio ou é nulo")
+            throw new InvalidInputFieldException("O campo de descrição do card está vazio ou é nulo")
         }
     }
 

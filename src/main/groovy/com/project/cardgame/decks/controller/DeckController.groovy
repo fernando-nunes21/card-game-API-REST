@@ -1,7 +1,7 @@
 package com.project.cardgame.decks.controller
 
-import com.project.cardgame.cards.exceptions.InputEmptyField
-import com.project.cardgame.cards.exceptions.NotFoundCard
+import com.project.cardgame.exceptions.InvalidInputFieldException
+import com.project.cardgame.exceptions.NotFoundException
 import com.project.cardgame.decks.dto.DeckDTO
 import com.project.cardgame.decks.service.DeckServiceImpl
 import com.project.cardgame.exceptions.LimitInvalidException
@@ -43,7 +43,7 @@ class DeckController {
     ResponseEntity getDeckById(@PathVariable Integer id) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(this.deckService.getDeckById(id))
-        } catch (NotFoundCard error) {
+        } catch (NotFoundException error) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDetails(error.getMessage()))
         }
     }
@@ -52,7 +52,7 @@ class DeckController {
     ResponseEntity createDeck(@RequestBody DeckDTO deckDTO) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(this.deckService.createDeck(deckDTO))
-        } catch (InputEmptyField error) {
+        } catch (InvalidInputFieldException error) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDetails(error.getMessage()))
         }
     }
@@ -61,9 +61,9 @@ class DeckController {
     ResponseEntity editDeck(@PathVariable Integer id, @RequestBody DeckDTO deckDTO) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(this.deckService.editDeck(id, deckDTO))
-        } catch (NotFoundCard error) {
+        } catch (NotFoundException error) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDetails(error.getMessage()))
-        } catch (InputEmptyField error) {
+        } catch (InvalidInputFieldException error) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorDetails(error.getMessage()))
         }
     }
@@ -72,7 +72,7 @@ class DeckController {
     ResponseEntity deleteDeck(@PathVariable Integer id) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(this.deckService.deleteDeck(id))
-        } catch (NotFoundCard error) {
+        } catch (NotFoundException error) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorDetails(error.getMessage()))
         }
     }
